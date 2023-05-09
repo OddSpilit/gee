@@ -1,0 +1,62 @@
+//r := gee.New()
+//r.GET("/", func(c *gee.Context) {
+//	c.HTML(http.StatusOK, "<h1>hello world</h1>")
+//})
+//
+//r.GET("/hello", func(c *gee.Context) {
+//	c.String(http.StatusOK, "hello %s, you are at %s\n", c.Query("name"), c.Path)
+//})
+//
+//r.GET("/hello/:name", func(c *gee.Context) {
+//	// expect /hello/geektutu
+//	c.String(http.StatusOK, "hello %s, you're at %s\n", c.Param("name"), c.Path)
+//})
+//r.Static("/assert", "./gee/static")
+//r.GET("/assets/*filepath", func(c *gee.Context) {
+//	c.JSON(http.StatusOK, gee.H{"filepath": c.Param("filepath")})
+//})
+//
+//v1 := r.Group("v1")
+//v1.Use(middleWares.Logger())
+//{
+//	v1.GET("/hello", func(c *gee.Context) {
+//		c.String(http.StatusOK, "hello %s, you're at %s\n", c.Param("name"), c.Path)
+//	})
+//	v1.POST("/login", func(c *gee.Context) {
+//		c.JSON(http.StatusOK, gee.H{
+//			"username": c.PostForm("username"),
+//			"password": c.PostForm("password"),
+//		})
+//	})
+//}
+
+//r.Use(middleWares.Logger(), middleWares.Recovery())
+//r.SetFuncMap(template.FuncMap{
+//	"FormatAsDate": comm.FormatAsDate,
+//})
+//r.LoadHtmlGlob("./gee/templates/*")
+//r.Static("/assets", "./gee/static")
+//r.GET("hello", func(c *gee.Context) {
+//	c.HTML(http.StatusOK, "test.tmpl", gee.H{
+//		"title": "gee",
+//		"now":   time.Date(2019, 8, 17, 0, 0, 0, 0, time.UTC),
+//	})
+//})
+//r.GET("panic", func(c *gee.Context) {
+//	name := []string{"panic"}
+//	c.String(http.StatusOK, name[100])
+//})
+//r.Run(":9999")
+geecache.NewGroup("scores", geecache.GetterFunc(
+    func(key string) ([]byte, error) {
+        log.Println("[SlowDB] search key", key)
+        if v, ok := db[key]; ok {
+            return []byte(v), nil
+        }
+        return nil, fmt.Errorf("%s not exist", key)
+    }), 2<<10)
+
+addr := "localhost:9999"
+peers := geecache.NewHTTPPool(addr)
+log.Println("geecache is running at", addr)
+log.Fatal(http.ListenAndServe(addr, peers))
