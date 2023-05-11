@@ -29,6 +29,7 @@ type httpGetter struct {
 }
 
 var _ PeerGetter = (*httpGetter)(nil)
+var _ PeerPicker = (*HTTPPool)(nil)
 
 func NewHTTPPool(self string) *HTTPPool {
 	return &HTTPPool{
@@ -42,7 +43,7 @@ func (p *HTTPPool) Log(format string, v ...interface{}) {
 }
 
 func (p *HTTPPool) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	if !strings.HasPrefix(req.URL.Path, p.basePath) {
+	if !strings.HasPrefix(req.URL.Path, p.basePath) && req.URL.Path != "/favicon.ico" {
 		panic(any("HTTPPool serving unexpected path: " + req.URL.Path))
 	}
 	p.Log("%s %s \n", req.Method, req.URL.Path)
@@ -61,14 +62,13 @@ func (p *HTTPPool) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "no such group: "+groupName, http.StatusNotFound)
 		return
 	}
-
 	view, err := group.Get(key)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-type", "application/octet-stream")
+	w.Header().Set("Content-type", "application/json")
 	w.Write(view.ByteSlice())
 }
 

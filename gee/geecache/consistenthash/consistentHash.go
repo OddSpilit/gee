@@ -10,7 +10,7 @@ type Hash func(data []byte) uint32
 
 type Map struct {
 	hash     Hash
-	replicas int
+	replicas int // 虚拟节点倍数
 	keys     []int
 	hashMap  map[int]string
 }
@@ -35,6 +35,7 @@ func (m *Map) Add(keys ...string) {
 			m.hashMap[hash] = key
 		}
 	}
+	sort.Ints(m.keys)
 }
 
 func (m *Map) Get(key string) string {
@@ -47,6 +48,5 @@ func (m *Map) Get(key string) string {
 	idx := sort.Search(len(m.keys), func(i int) bool {
 		return m.keys[i] >= hash
 	})
-
 	return m.hashMap[m.keys[idx%len(m.keys)]]
 }
