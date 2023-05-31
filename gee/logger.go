@@ -1,13 +1,12 @@
-package middleWares
+package gee
 
 import (
-	"gee/gee"
 	"log"
 	"time"
 )
 
-func Logger() gee.HandlerFunc {
-	return func(c *gee.Context) {
+func Logger() HandlerFunc {
+	return func(c *Context) {
 		t := time.Now()
 		c.Next()
 		log.Printf("[%d] %s in %v \n", c.StatusCode, c.Req.RequestURI, time.Since(t))

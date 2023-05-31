@@ -1,16 +1,15 @@
-package middleWares
+package gee
 
 import (
 	"fmt"
-	"gee/gee"
 	"log"
 	"net/http"
 	"runtime"
 	"strings"
 )
 
-func Recovery() gee.HandlerFunc {
-	return func(c *gee.Context) {
+func Recovery() HandlerFunc {
+	return func(c *Context) {
 		defer func() {
 			if err := recover(); err != nil {
 				message := fmt.Sprintf("%s\n", err)

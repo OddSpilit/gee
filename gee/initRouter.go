@@ -1,20 +1,35 @@
 package gee
 
-import "net/http"
+import (
+	"net/http"
+)
 
-/**
+/*
+*
 注册路由
 */
 func InitRouter() {
 	r := New()
 	r.Static("/assets", "./gee/static")
 	r.LoadHtmlGlob("./gee/templates/*")
-	r.Group("v1")
+	v1 := r.Group("v1")
+	v1.Use(Logger())
 	{
-		r.GET("/", func(c *Context) {
+		v1.GET("/hello", func(c *Context) {
 			c.HTML(http.StatusOK, "test.tmpl", H{
 				"title":   "gee",
-				"content": "hello world",
+				"content": "hello v1",
+			})
+		})
+	}
+
+	v2 := r.Group("v2")
+	v2.Use(Logger())
+	{
+		v2.GET("/hello", func(c *Context) {
+			c.HTML(http.StatusOK, "test.tmpl", H{
+				"title":   "gee",
+				"content": "hello v2",
 			})
 		})
 	}
