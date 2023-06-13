@@ -42,12 +42,13 @@ func (group *RouterGroup) Use(middleWares ...HandlerFunc) {
 	group.middleWares = append(group.middleWares, middleWares...)
 }
 
-/**
+/*
+*
 创建服务静态目录
 */
 func (group *RouterGroup) createStaticHandler(relativePath string, fs http.FileSystem) HandlerFunc {
-	absolutPath := path.Join(group.prefix, relativePath)
-	fileServer := http.StripPrefix(absolutPath, http.FileServer(fs))
+	absolutePath := path.Join(group.prefix, relativePath)
+	fileServer := http.StripPrefix(absolutePath, http.FileServer(fs))
 	return func(c *Context) {
 		file := c.Param("filepath")
 		if _, err := fs.Open(file); err != nil {
